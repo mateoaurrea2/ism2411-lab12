@@ -1,9 +1,24 @@
 # ISM2411 Lab 12 — Read a Sales CSV, Write a Cleaned Report
 # Name: Mateo Urrea
 # Run from the ism2411-lab12 folder:  python3 csv_practice.py
+#
+# REFLECTION
+# 1. Compared to doing this ETL task in Excel, Python makes the whole process
+#    repeatable: once the script is written, I can rerun it on a new or much
+#    larger sales file in one command, with no manual filtering or copy/paste
+#    and no risk of clicking the wrong cell. Excel is still easier for quick,
+#    one-off exploration, eyeballing the data, and making charts or formatted
+#    reports that non-programmers can open and edit directly.
+#
+# 2. A store's end-of-day sales close-out would benefit from an append-mode log:
+#    each night a script records the date, register, and total sales as one new
+#    line. Append mode is the right tool because it adds to the history instead
+#    of overwriting it ("w" would erase every previous day), so the file becomes
+#    a running audit trail managers can review for trends or discrepancies.
 
 import csv
 import os
+from datetime import datetime
 
 SALES_FILE = "data/sales.csv"
 CLEANED_FILE = "data/cleaned.csv"
@@ -118,3 +133,14 @@ with open(SALES_FILE, "r") as f:
 for product in sorted(summary):
     print(f"{product}: ${summary[product]:.2f}")
 print()
+
+# ---------------------------------------------------------------
+# Exercise 8 · Append mode log
+# ---------------------------------------------------------------
+print("=== Exercise 8: Append mode log ===")
+timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+with open(LOG_FILE, "a") as log:
+    log.write(f"{timestamp} - Total revenue: ${total_revenue:.2f}\n")
+with open(LOG_FILE, "r") as log:
+    entries = log.readlines()
+print(f"Logged run to {LOG_FILE} ({len(entries)} entries so far)")
