@@ -81,3 +81,40 @@ with open(SALES_FILE, "r") as infile, open(CLEANED_FILE, "w", newline="") as out
             written_count += 1
 print(f"Wrote {written_count} of {original_count} rows to {CLEANED_FILE} (orders > $100)")
 print()
+
+# ---------------------------------------------------------------
+# Exercise 6 · csv.DictReader
+# ---------------------------------------------------------------
+# csv.reader gives lists, so you access columns by position (row[1]) — fine for
+# small, fixed files, but it breaks silently if the column order ever changes.
+# csv.DictReader gives dicts keyed by header name (row["price"]) — more readable
+# and robust, so I'd prefer it whenever the file has a header row.
+print("=== Exercise 6: csv.DictReader ===")
+dict_total = 0
+with open(SALES_FILE, "r") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        product = row["product"]
+        price = float(row["price"])
+        quantity = int(row["quantity"])
+        line_total = price * quantity
+        dict_total += line_total
+        print(f"{product}: {quantity} units × ${price:.2f} = ${line_total:.2f}")
+print(f"Total revenue: ${dict_total:.2f}")
+print(f"Matches Exercise 4 total: {round(dict_total, 2) == round(total_revenue, 2)}")
+print()
+
+# ---------------------------------------------------------------
+# Exercise 7 · Sales summary by product
+# ---------------------------------------------------------------
+print("=== Exercise 7: Sales summary by product ===")
+summary = {}
+with open(SALES_FILE, "r") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        product = row["product"]
+        line_total = float(row["price"]) * int(row["quantity"])
+        summary[product] = summary.get(product, 0) + line_total
+for product in sorted(summary):
+    print(f"{product}: ${summary[product]:.2f}")
+print()
