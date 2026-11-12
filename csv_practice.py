@@ -30,8 +30,12 @@ LOG_FILE = "data/run_log.txt"
 print("=== Exercise 1: Get the file ===")
 print(f"{SALES_FILE} exists: {os.path.exists(SALES_FILE)}")
 with open(SALES_FILE, "r") as f:
-    line_count = len(f.readlines())
-print(f"Lines in file (header + data): {line_count}")
+    reader = csv.reader(f)
+    file_header = next(reader)
+    data_rows = list(reader)
+print(f"Header columns: {file_header}")
+print(f"Header is product, price, quantity: {file_header == ['product', 'price', 'quantity']}")
+print(f"Data rows: {len(data_rows)} (expected 12)")
 print()
 
 # ---------------------------------------------------------------
@@ -42,6 +46,7 @@ with open(SALES_FILE, "r") as f:
     reader = csv.reader(f)
     for row in reader:
         print(row)  # every value is a string, e.g. ['Widget A', '9.99', '50']
+print(f"Type of the last row's price value: {type(row[1]).__name__}")  # str, not float
 print()
 
 # ---------------------------------------------------------------
@@ -100,10 +105,8 @@ print()
 # ---------------------------------------------------------------
 # Exercise 6 · csv.DictReader
 # ---------------------------------------------------------------
-# csv.reader gives lists, so you access columns by position (row[1]) — fine for
-# small, fixed files, but it breaks silently if the column order ever changes.
-# csv.DictReader gives dicts keyed by header name (row["price"]) — more readable
-# and robust, so I'd prefer it whenever the file has a header row.
+# csv.reader (row[1]) is fine for small files with a fixed, known column order or no header row.
+# csv.DictReader (row["price"]) is more readable and survives column reordering, so I prefer it when there's a header.
 print("=== Exercise 6: csv.DictReader ===")
 dict_total = 0
 with open(SALES_FILE, "r") as f:
